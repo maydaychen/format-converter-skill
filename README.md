@@ -1,104 +1,113 @@
 # Format Converter Skill
 
-A comprehensive file format conversion toolkit for Moltbot that supports converting between common document formats with professional quality output.
+A Moltbot skill for common format conversions, starting with Markdown to PDF.
 
-## 🚀 Features
+## Features
 
-- **Markdown to PDF**: High-quality PDF generation with proper typography, table of contents, and code highlighting
-- **Multi-language Support**: Full Unicode support including Chinese, Japanese, and other international characters
-- **Custom Styling**: Apply custom CSS styles or LaTeX templates for branded output
-- **Professional Layout**: Automatic section numbering, headers, footers, and page formatting
-- **Extensible Design**: Easy to add new format converters (HTML, DOCX, CSV, etc.)
+- **Markdown to PDF**: Convert Markdown files to high-quality PDF documents
+- **Chinese Support**: Full Unicode and Chinese character support via XeLaTeX
+- **Custom Styling**: Support for CSS stylesheets and LaTeX templates
+- **Professional Typesetting**: Automatic table of contents, section numbering, code highlighting
+- **Multiple PDF Engines**: Support for both pdflatex (English) and xelatex (Unicode/Chinese)
 
-## 📁 Directory Structure
+## Requirements
 
-```
-format-converter/
-├── SKILL.md                 # Skill metadata and usage instructions
-├── README.md               # This file
-├── scripts/                # Executable conversion scripts
-│   └── md_to_pdf.py       # Markdown to PDF converter
-└── references/             # Documentation and examples
-    └── usage_examples.md   # Practical usage examples
-```
+- Python 3.6+
+- Pandoc >= 2.0
+- TeX Live (basic + fonts recommended collections)
+- Required Python packages: none (uses only standard library)
 
-## ⚙️ Installation Requirements
+## Installation
 
-The skill requires the following system dependencies:
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/maydaychen/format-converter-skill.git
+   ```
 
-- **pandoc** (v2.0+) - Universal document converter
-- **TeX Live** - LaTeX typesetting system
-  - Basic collection (`texlive-collection-basic`)
-  - Font recommendations (`texlive-collection-fontsrecommended`)  
-  - LaTeX collection (`texlive-collection-latex`)
+2. Install dependencies:
+   ```bash
+   # Install pandoc
+   sudo apt-get install pandoc  # Ubuntu/Debian
+   sudo yum install pandoc      # CentOS/RHEL
+   
+   # Install TeX Live (minimum required)
+   sudo apt-get install texlive texlive-xetex texlive-fonts-recommended
+   ```
 
-These are automatically installed when the skill is deployed on compatible systems.
+## Usage
 
-## 🎯 Usage
-
-### Basic Markdown to PDF Conversion
-
+### Basic Conversion
 ```bash
 python3 scripts/md_to_pdf.py input.md output.pdf
 ```
 
-### Advanced Options
-
+### With Custom CSS
 ```bash
-# With custom CSS styling
-python3 scripts/md_to_pdf.py --css styles.css input.md output.pdf
+python3 scripts/md_to_pdf.py --css style.css input.md output.pdf
+```
 
-# With custom LaTeX template
+### With LaTeX Template
+```bash
 python3 scripts/md_to_pdf.py --template template.latex input.md output.pdf
 ```
 
-### Command Line Options
+### Specify PDF Engine (for advanced use)
+The script automatically detects if the input contains Unicode characters and uses xelatex accordingly.
+For manual control, you can modify the script or use pandoc directly:
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `input` | Input Markdown file path | Required |
-| `output` | Output PDF file path | Required |
-| `--css` | Path to CSS file for styling | None |
-| `--template` | Path to LaTeX template file | None |
+```bash
+# For English-only documents (faster)
+pandoc input.md -o output.pdf --pdf-engine=pdflatex
 
-## 🌟 Example Workflow
+# For Unicode/Chinese documents
+pandoc input.md -o output.pdf --pdf-engine=xelatex
+```
 
-1. **Create your Markdown document** (`document.md`)
-2. **(Optional) Create custom styling** (`styles.css`)
-3. **Run the converter**:
-   ```bash
-   python3 scripts/md_to_pdf.py document.md document.pdf
-   ```
-4. **Get professional PDF output** ready for sharing or printing
+## Examples
 
-## 🔧 Technical Details
+### Simple Document
+```bash
+python3 scripts/md_to_pdf.py examples/simple.md simple.pdf
+```
 
-- **Engine**: Uses pandoc with pdflatex/xelatex backend
-- **Unicode Support**: Full UTF-8 support with proper font handling
-- **Error Handling**: Comprehensive error messages and exit codes
-- **Compatibility**: Works with Python 3.6+ and standard Unix/Linux systems
+### Document with Chinese
+```bash
+python3 scripts/md_to_pdf.py examples/chinese.md chinese.pdf
+```
 
-## 📈 Future Extensions
+### Document with Custom Styling
+```bash
+python3 scripts/md_to_pdf.py --css examples/style.css styled.md styled.pdf
+```
 
-Planned format conversions to add:
-- HTML ↔ Markdown bidirectional conversion
-- DOCX ↔ Markdown conversion  
-- CSV ↔ JSON data format conversion
-- Image format conversions (PNG, JPEG, WebP)
-- EPUB ebook generation
+## Error Handling
 
-## 🤝 Integration with Moltbot
+Common errors and solutions:
 
-This skill integrates seamlessly with Moltbot's agent system:
-- Automatically triggered when format conversion is needed
-- Provides clear usage instructions in `SKILL.md`
-- Bundled resources are loaded only when needed to minimize context usage
-- Follows Moltbot's progressive disclosure design principles
+- **"pdflatex not found"**: Install TeX Live basic packages
+- **"Unicode character not set up for use with LaTeX"**: The script should automatically switch to xelatex, but if it doesn't, ensure your document encoding is UTF-8
+- **"Permission denied"**: Ensure output directory is writable
+- **Table formatting issues**: Avoid complex table structures or use HTML tables instead of Markdown tables
 
-## 📄 License
+## Extending the Skill
 
-This skill is designed for use with Moltbot and follows the same licensing terms as the Moltbot platform.
+To add new format conversions:
 
----
+1. Create new scripts in the `scripts/` directory
+2. Update `SKILL.md` description to include new capabilities
+3. Add usage examples to `references/usage_examples.md`
 
-**Note**: For Chinese and other CJK language support, ensure xelatex is available and consider using appropriate LaTeX templates with CJK font packages.
+Example script structure:
+```python
+def convert_format(input_file, output_file, **options):
+    # Your conversion logic here
+    pass
+```
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Author
+
+Created by Haro Assistant for Moltbot.

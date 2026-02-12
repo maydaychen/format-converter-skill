@@ -1,31 +1,28 @@
 #!/usr/bin/env python3
 """
-Markdown to PDF converter using pandoc
+Markdown to PDF converter using pandoc with xelatex (for Chinese support)
 
-This script converts Markdown files to PDF using pandoc with LaTeX backend.
-It supports basic styling through CSS or custom LaTeX templates.
-Supports both pdflatex (for English) and xelatex (for Chinese/Unicode).
+This script converts Markdown files to PDF using pandoc with xelatex engine.
+It's specifically designed for documents containing Chinese characters.
 
 Usage:
-    python md_to_pdf.py input.md output.pdf [--css style.css] [--template template.latex] [--engine pdflatex|xelatex]
+    python md_to_pdf_xe.py input.md output.pdf [--css style.css] [--template template.latex]
 """
 
 import argparse
 import subprocess
 import sys
 import os
-from pathlib import Path
 
-def convert_md_to_pdf(input_file, output_file, css_file=None, template_file=None, pdf_engine='pdflatex'):
+def convert_md_to_pdf(input_file, output_file, css_file=None, template_file=None):
     """
-    Convert Markdown file to PDF using pandoc
+    Convert Markdown file to PDF using pandoc with xelatex
     
     Args:
         input_file (str): Path to input Markdown file
         output_file (str): Path to output PDF file
-        css_file (str, optional): Path to CSS file for styling (for HTML-based conversion)
+        css_file (str, optional): Path to CSS file for styling
         template_file (str, optional): Path to LaTeX template file
-        pdf_engine (str): PDF engine to use ('pdflatex' or 'xelatex')
     """
     if not os.path.exists(input_file):
         raise FileNotFoundError("Input file not found: {}".format(input_file))
@@ -35,17 +32,13 @@ def convert_md_to_pdf(input_file, output_file, css_file=None, template_file=None
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
-    # Validate PDF engine
-    if pdf_engine not in ['pdflatex', 'xelatex']:
-        raise ValueError("PDF engine must be 'pdflatex' or 'xelatex'")
-    
-    # Build pandoc command
+    # Build pandoc command with xelatex
     cmd = ['pandoc', input_file, '-o', output_file]
     
-    # Add PDF engine
-    cmd.extend(['--pdf-engine={}'.format(pdf_engine)])
+    # Use xelatex for Chinese support
+    cmd.extend(['--pdf-engine=xelatex'])
     
-    # Add CSS if provided (for HTML-based styling)
+    # Add CSS if provided
     if css_file and os.path.exists(css_file):
         cmd.extend(['--css', css_file])
     
@@ -53,16 +46,15 @@ def convert_md_to_pdf(input_file, output_file, css_file=None, template_file=None
     if template_file and os.path.exists(template_file):
         cmd.extend(['--template', template_file])
     
-    # Add default extensions for better Markdown support
+    # Add default extensions
     cmd.extend([
         '--standalone',
-        '--toc',  # Table of contents
-        '--number-sections',  # Number sections
-        '--highlight-style=pygments'  # Code highlighting
+        '--toc',
+        '--number-sections',
+        '--highlight-style=pygments'
     ])
     
     try:
-        # Use universal_newlines instead of text for Python 3.6 compatibility
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, check=True)
         print("Successfully converted {} to {}".format(input_file, output_file))
         return True
@@ -75,13 +67,11 @@ def convert_md_to_pdf(input_file, output_file, css_file=None, template_file=None
         return False
 
 def main():
-    parser = argparse.ArgumentParser(description='Convert Markdown to PDF')
+    parser = argparse.ArgumentParser(description='Convert Markdown to PDF (with Chinese support)')
     parser.add_argument('input', help='Input markdown file')
     parser.add_argument('output', help='Output PDF file')
     parser.add_argument('--css', help='Optional CSS file for styling')
     parser.add_argument('--template', help='Optional LaTeX template file')
-    parser.add_argument('--engine', choices=['pdflatex', 'xelatex'], default='pdflatex',
-                        help='PDF engine to use (default: pdflatex)')
     
     args = parser.parse_args()
     
@@ -89,8 +79,7 @@ def main():
         args.input, 
         args.output, 
         args.css, 
-        args.template,
-        args.engine
+        args.template
     )
     
     sys.exit(0 if success else 1)
