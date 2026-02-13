@@ -5,17 +5,25 @@ A Moltbot skill for common format conversions, starting with Markdown to PDF.
 ## Features
 
 - **Markdown to PDF**: Convert Markdown files to high-quality PDF documents
-- **Chinese Support**: Full Unicode and Chinese character support via XeLaTeX
+- **Chinese Support**: Full Unicode and Chinese character support via XeLaTeX or WeasyPrint
 - **Custom Styling**: Support for CSS stylesheets and LaTeX templates
 - **Professional Typesetting**: Automatic table of contents, section numbering, code highlighting
-- **Multiple PDF Engines**: Support for both pdflatex (English) and xelatex (Unicode/Chinese)
+- **Multiple PDF Engines**: 
+  - **LaTeX-based**: pdflatex (English) and xelatex (Unicode/Chinese)
+  - **HTML-based**: WeasyPrint (better table and Chinese support)
 
 ## Requirements
 
+### Option 1: LaTeX-based (default)
 - Python 3.6+
 - Pandoc >= 2.0
 - TeX Live (basic + fonts recommended collections)
-- Required Python packages: none (uses only standard library)
+
+### Option 2: HTML-based (WeasyPrint)
+- Python 3.6+
+- Pandoc >= 2.0
+- WeasyPrint (`pip install weasyprint`)
+- System fonts (including Chinese fonts for Chinese content)
 
 ## Installation
 
@@ -25,6 +33,8 @@ A Moltbot skill for common format conversions, starting with Markdown to PDF.
    ```
 
 2. Install dependencies:
+
+   **For LaTeX-based conversion (recommended for most cases):**
    ```bash
    # Install pandoc
    sudo apt-get install pandoc  # Ubuntu/Debian
@@ -34,14 +44,25 @@ A Moltbot skill for common format conversions, starting with Markdown to PDF.
    sudo apt-get install texlive texlive-xetex texlive-fonts-recommended
    ```
 
+   **For HTML-based conversion (better for complex tables/Chinese):**
+   ```bash
+   pip install weasyprint
+   # Also ensure system has Chinese fonts installed
+   ```
+
 ## Usage
 
-### Basic Conversion
+### LaTeX-based Conversion (default)
 ```bash
 python3 scripts/md_to_pdf.py input.md output.pdf
 ```
 
-### With Custom CSS
+### HTML-based Conversion (better Chinese/table support)
+```bash
+python3 scripts/md_to_pdf_weasyprint.py input.md output.pdf
+```
+
+### With Custom CSS (LaTeX-based)
 ```bash
 python3 scripts/md_to_pdf.py --css style.css input.md output.pdf
 ```
@@ -51,33 +72,21 @@ python3 scripts/md_to_pdf.py --css style.css input.md output.pdf
 python3 scripts/md_to_pdf.py --template template.latex input.md output.pdf
 ```
 
-### Specify PDF Engine (for advanced use)
-The script automatically detects if the input contains Unicode characters and uses xelatex accordingly.
-For manual control, you can modify the script or use pandoc directly:
-
-```bash
-# For English-only documents (faster)
-pandoc input.md -o output.pdf --pdf-engine=pdflatex
-
-# For Unicode/Chinese documents
-pandoc input.md -o output.pdf --pdf-engine=xelatex
-```
-
 ## Examples
 
-### Simple Document
+### Simple Document (LaTeX)
 ```bash
 python3 scripts/md_to_pdf.py examples/simple.md simple.pdf
 ```
 
-### Document with Chinese
+### Document with Chinese (LaTeX)
 ```bash
 python3 scripts/md_to_pdf.py examples/chinese.md chinese.pdf
 ```
 
-### Document with Custom Styling
+### Document with Complex Tables (HTML/WeasyPrint)
 ```bash
-python3 scripts/md_to_pdf.py --css examples/style.css styled.md styled.pdf
+python3 scripts/md_to_pdf_weasyprint.py examples/complex-tables.md tables.pdf
 ```
 
 ## Error Handling
@@ -85,9 +94,25 @@ python3 scripts/md_to_pdf.py --css examples/style.css styled.md styled.pdf
 Common errors and solutions:
 
 - **"pdflatex not found"**: Install TeX Live basic packages
-- **"Unicode character not set up for use with LaTeX"**: The script should automatically switch to xelatex, but if it doesn't, ensure your document encoding is UTF-8
+- **"Unicode character not set up for use with LaTeX"**: Use the WeasyPrint version or ensure proper encoding
 - **"Permission denied"**: Ensure output directory is writable
-- **Table formatting issues**: Avoid complex table structures or use HTML tables instead of Markdown tables
+- **Table formatting issues**: For complex tables, use the WeasyPrint version which handles HTML tables better
+
+## Scripts
+
+### `scripts/md_to_pdf.py`
+- Uses pandoc + LaTeX (pdflatex/xelatex)
+- Best for standard documents with good typography
+- Requires TeX Live installation
+
+### `scripts/md_to_pdf_xe.py`
+- Uses pandoc + xelatex specifically for Chinese/Unicode
+- Better Unicode support than pdflatex
+
+### `scripts/md_to_pdf_weasyprint.py`
+- Uses pandoc + WeasyPrint (HTML/CSS based)
+- Better handling of complex tables and Chinese characters
+- Doesn't require TeX Live, but needs WeasyPrint and system fonts
 
 ## Extending the Skill
 

@@ -9,7 +9,7 @@ This skill provides tools for converting between various document formats, with 
 
 ## Supported Conversions
 
-- **Markdown → PDF**: Professional PDF generation with LaTeX backend
+- **Markdown → PDF**: Professional PDF generation with LaTeX backend or WeasyPrint (HTML/CSS)
 - **Markdown → HTML**: Web-ready HTML output  
 - **Markdown → DOCX**: Microsoft Word compatible documents
 - **Other formats**: Additional converters can be added as needed
@@ -19,11 +19,14 @@ This skill provides tools for converting between various document formats, with 
 ### Convert Markdown to PDF
 
 ```bash
-# Basic conversion
+# Basic conversion (LaTeX backend)
 python3 scripts/md_to_pdf.py input.md output.pdf
 
-# With custom CSS styling
+# With custom CSS styling (LaTeX backend)
 python3 scripts/md_to_pdf.py input.md output.pdf --css style.css
+
+# Alternative: WeasyPrint backend (better for Chinese/tables)
+python3 scripts/md_to_pdf_weasyprint.py input.md output.pdf
 ```
 
 ### Usage Examples
@@ -54,6 +57,25 @@ Converts Markdown files to PDF using pandoc with LaTeX backend.
 - Syntax highlighting for code blocks
 - Professional typography and layout
 
+### `scripts/md_to_pdf_weasyprint.py`
+
+Converts Markdown files to PDF using weasyprint (HTML/CSS based), which handles tables and Chinese characters better than LaTeX-based approaches.
+
+**Arguments:**
+- `input`: Input markdown file path
+- `output`: Output PDF file path
+
+**Requirements:**
+- pandoc (for Markdown to HTML conversion)
+- weasyprint (for HTML to PDF conversion)
+- System fonts with Chinese support (e.g., wqy-microhei-fonts)
+
+**Features:**
+- Better table rendering
+- Excellent Chinese character support
+- CSS-based styling
+- No LaTeX compilation issues
+
 ## Adding New Converters
 
 To add support for additional format conversions:
@@ -72,7 +94,14 @@ To add support for additional format conversions:
 ## Dependencies
 
 The skill requires the following system packages:
+
+**For LaTeX backend:**
 - `pandoc` - Document converter
 - `texlive-collection-basic` - Basic LaTeX support
 - `texlive-collection-fontsrecommended` - Recommended fonts
 - `texlive-collection-latex` - Core LaTeX packages
+
+**For WeasyPrint backend:**
+- `pandoc` - Document converter
+- `weasyprint` - HTML to PDF converter
+- `wqy-microhei-fonts` - Chinese font support (optional but recommended)
